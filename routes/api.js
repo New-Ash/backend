@@ -5,11 +5,18 @@ const BlogPost = require('../models/blogPost');
 // const Course = require('../models/Course');
 // const Lecture = require('../models/Lecture');
 // const Note = require('../models/Note');
-// const Professor = require('../models/Professor');
+const Professor = require('../models/Professor');
 // const Review = require('../models/Review');
-// const Student = require('../models/Student');
+const Student = require('../models/Student');
 
+const middleware = (req,res,next) => {
+    const authToken = req.headers['Authorization']
 
+    if(jwt.verify(authToken))
+        next()
+    else
+        res.status(401).json({})
+}
 
 router.get('/api',(req,res)=>{
     // const data = {

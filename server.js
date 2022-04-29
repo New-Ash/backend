@@ -12,6 +12,7 @@ const Review = require('./models/Review');
 const Student = require('./models/Student');
 
 
+
 const app = express();
 const PORT = process.env.PORT || 8080;
 
@@ -27,19 +28,19 @@ mongoose.connection.on('connected',()=>{
 });
 
 const data = {
-    profName : 'Prof ff',
-    courses : ['C prog', 'Daa' , 'Trr'], ////////////
-    profEmail : 'fjnfsd'
+    title : 'Prof ff',
+    body : 'hello world' ////////////
+    
 };
-const nCourse = new Professor(data);
-nCourse.save((error)=>{
-    if(error){
-        console.log('Error Course')
-    }
-    else{
-        console.log('Data saved');
-    }
-})
+// const nCourse = new Professor(data);
+// nCourse.save((error)=>{
+//     if(error){
+//         console.log('Error Course')
+//     }
+//     else{
+//         console.log('Data saved');
+//     }
+// })
 
 app.use(morgan('tiny'));
 app.use('/',routes);

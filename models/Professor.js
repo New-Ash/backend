@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
-
+const Course = require('../models/Course');
 //schema
 const Schema = mongoose.Schema;
 const ProfessorSchema = new Schema({
-    profName : String,
-    courses : Array, ////////////
-    profEmail : String
+    name : String,
+    courses : [Course], ////////////
+    email : String,
+    password : String
 });
 
 //model

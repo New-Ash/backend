@@ -7,7 +7,8 @@ const NoteSchema = new Schema({
     courseId : String,
     timeStamp : String,
     note : String,
-    studentId : String
+    studentId : String,
+    public : Boolean
 });
 
 //model

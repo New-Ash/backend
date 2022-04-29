@@ -7,7 +7,8 @@ const ReviewSchema = new Schema({
     timeStamp : String,
     rating : String,
     feedBack: String,
-    studentId : String
+    studentId : String,
+    courseId : String
 });
 
 //model

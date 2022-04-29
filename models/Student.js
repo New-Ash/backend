@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
+const Course = require('./Course');
 
 //schema
 const Schema = mongoose.Schema;
 const StudentSchema = new Schema({
-    studentName : String,
-    dateOfBirth : String,
-     courses : [], //////////////
-    studentEmail : String
+    name : String,
+    studentId : String,
+    password : String,
+     courses : Array, //////////////
+    email : String
 });
 
 //model
