@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const CourseSchema = new Schema({
   courseName: String,
-  profId: String, ///////////
+  profName: String, ///////////
   courseId: String,
 });
 
