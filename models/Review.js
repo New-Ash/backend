@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const ReviewSchema = new Schema({
     lecNo : String,
     timeStamp : String,
-    rating : String,
+    rating : String, //integer
     feedBack: String,
     studentId : String,
     courseId : String
