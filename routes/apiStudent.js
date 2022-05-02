@@ -35,6 +35,7 @@ router.post("/login", (req, res) => {
       console.log("error ", err);
       res.status(404);
     } else {
+
       if (foundStudent) {
         if (foundStudent.password === req.body.password) {
           res.send({ student: foundStudent, found: true, match: true });
@@ -59,6 +60,7 @@ router.post("/course/content", (req, res) => {
     });
 });
 
+// no multiple enrollments ********
 router.post("/course/enroll", (req, res) => {
   Student.findOne({ studentId: req.body.studentId }, (err, foundStudent) => {
     if (err) {
@@ -68,18 +70,34 @@ router.post("/course/enroll", (req, res) => {
         if (err) {
           console.log(err);
         } else if (foundCourse) {
-          foundStudent.courses = foundStudent.courses.concat(foundCourse);
-          foundStudent.save((err, savedStudent) => {
-            if (err) console.log(err);
-          });
-          res.send({ student: savedStudent, updated: true });
+          if(!foundCourse.studentIds.includes(foundStudent.studentId)){
+            foundCourse.studentIds = foundCourse.studentIds.concat(foundStudent.studentId)
+            foundCourse.save((err, savedCourse) => {
+              if (err) console.log(err);
+              else{
+                foundStudent.courses = foundStudent.courses.concat({courseId : savedCourse.courseId , courseName : savedCourse.courseName});
+                foundStudent.save((err,savedStudent) => {
+                  if (err) console.log(err);
+                  else{
+                    res.send({ student: savedStudent, updated: true });
+                  }
+                  
+                });
+              }
+  
+            });
+
+          } 
+          else{
+            res.send({updated : false});
+          }
         }
       });
     }
   });
 });
 
-router.post("/lecture", (req, res) => {
+router.post("/lecturelink", (req, res) => {
   let notesToSend = [];
   let reviewsToSend = [];
   let vidLink = null;
@@ -106,18 +124,6 @@ router.post("/lecture", (req, res) => {
       );
     }
   });
-  // Review.find(
-  //   {
-  //     $and: [{ courseId: req.body.courseId }, { lecNo: req.body.lecNo }, { studentId: req.body.studentId }],
-  //   },
-  //   (err, foundReviews) => {
-  //     if (err) {
-  //       console.log("error", error);
-  //     } else {
-  //       reviewsToSend = foundReviews;
-  //     }
-  //   }
-  // );
   // Lecture.find(
   //   {
   //     $and: [{ courseId: req.body.courseId }, { lecNo: req.body.lecNo }],

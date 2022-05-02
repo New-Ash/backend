@@ -58,148 +58,93 @@ router.post("/course/content", (req, res) => {
     });
 });
 
+// prof cant add already exisiting course
 router.post("/course/add", (req, res) => {
   Professor.findOne({ email: req.body.email }, (err, foundProfessor) => {
     if (err) {
       console.log(err);
     } else if (foundProfessor) {
-      const newCourse = new Course({
-        courseId: req.body.courseId,
-        courseName: req.body.courseName,
-        profName: foundProfessor.name,
-      });
-      newCourse.save((err, savedCourse) => {
-        if (err) {
-          console.log(err);
-        } else {
-          foundProfessor.courses = foundProfessor.courses.concat(savedCourse);
-          foundProfessor.save((err, savedProf) => {
+      Course.findOne({courseId : req.body.courseId}, (err,foundCourse)=>{
+        if(err){
+          console.log(err)
+        }
+        else if (!foundCourse){
+          const newCourse = new Course({
+            courseId: req.body.courseId,
+            courseName: req.body.courseName,
+            profName: foundProfessor.name,
+            studentIds : []
+          });
+          newCourse.save((err, savedCourse) => {
             if (err) {
               console.log(err);
             } else {
-              res.send({ professor: savedProf, updated: true });
+              foundProfessor.courses = foundProfessor.courses.concat({courseId : savedCourse.courseId , courseName : savedCourse.courseName});
+              foundProfessor.save((err, savedProf) => {
+                if (err) {
+                  console.log(err);
+                } else {
+                  res.send({ professor: savedProf, updated: true });
+                }
+              });
             }
           });
+
         }
-      });
+      })
+
     }
   });
 });
 
-router.post("/lecture", (req, res) => {
-  let notesToSend = [];
-  let reviewsToSend = [];
-  let vidLink = null;
-  Note.find({ $and: [{ courseId: req.body.courseId }, { lecNo: req.body.lecNo }] }, (err, foundNotes) => {
-    if (err) {
-      console.log("error", error);
-    } else {
-      // console.log(foundNotes)
-      notesToSend.push(foundNotes.filter((element) => element.public || element.studentId === req.body.studentId));
-      console.log(notesToSend);
-      //check
-      Review.find(
-        {
-          $and: [{ courseId: req.body.courseId }, { lecNo: req.body.lecNo }, { studentId: req.body.studentId }],
-        },
-        (err, foundReviews) => {
-          if (err) {
-            console.log("error", error);
-          } else {
-            reviewsToSend = foundReviews;
-            res.send({ notes: notesToSend, reviews: reviewsToSend });
-          }
-        }
-      );
+router.post("/course/details", (req, res) => {
+
+  Course.find(
+    {
+      courseId : req.body.courseId
+    },
+    (err, foundCourse) => {
+      if (err) {
+        console.log("error", error);
+      } else {
+        res.send(foundCourse);
+      }
     }
-  });
-  // Review.find(
-  //   {
-  //     $and: [{ courseId: req.body.courseId }, { lecNo: req.body.lecNo }, { studentId: req.body.studentId }],
-  //   },
-  //   (err, foundReviews) => {
-  //     if (err) {
-  //       console.log("error", error);
-  //     } else {
-  //       reviewsToSend = foundReviews;
-  //     }
-  //   }
-  // );
-  // Lecture.find(
-  //   {
-  //     $and: [{ courseId: req.body.courseId }, { lecNo: req.body.lecNo }],
-  //   },
-  //   (err, foundLec) => {
-  //     if (err) {
-  //       console.log(err);
-  //     } else if (foundLec) {
-  //       vidLink = foundLec.recordingLink;
-  //     }
-  //   }
-  // );
+  );
+
 });
 
-// send  {note  : {json object}}
-router.post("/note/add", (req, res) => {
-  const newNote = new Note(req.body.note);
-  newNote.save((err, savedNote) => {
+
+
+router.post("/lecturelink", (req, res) => {
+
+  Review.find(
+    {
+      $and: [{ courseId: req.body.courseId }, { lecNo: req.body.lecNo }],
+    },
+    (err, foundReviews) => {
+      if (err) {
+        console.log("error", error);
+      } else {
+        res.send(foundReviews);
+      }
+    }
+  );
+
+});
+router.post("/lecture/add", (req, res) => {
+
+  const newLecture = new Lecture(req.body.lecture);
+  newLecture.save((err, savedLecture) => {
     if (err) {
       res.status(404).json({ msg: "Sorry,server error" });
     } else {
-      console.log("Added in notes");
-      res.send({ noteid: savedNote._id, message: "Note added" });
+      console.log("Added in lectures");
+      res.send({ lectureid: savedLecture._id, message: "Lecture added" });
     }
   });
+
 });
 
-//user can delete public notes
-router.post("/note/delete", (req, res) => {
-  Note.deleteOne({ _id: mongoose.Types.ObjectId(req.body.noteId) }, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.send({ message: "Note deleted" });
-    }
-  });
-});
-
-router.post("/note/update", (req, res) => {
-  const note = req.body.note;
-  Note.findById(note.noteId, (err, foundNote) => {
-    if (err) {
-      console.log(err);
-    } else if (foundNote) {
-      foundNote.content = note.content;
-      foundNote.save((err) => {
-        if (err) console.log(err);
-        else {
-          res.send({ message: "Note updated" });
-        }
-      });
-    }
-  });
-});
-
-router.post("/review/add", (req, res) => {
-  const newReview = new Review(req.body.review);
-  newReview.save((err, savedReview) => {
-    if (err) {
-      res.status(404).json({ msg: "Sorry,server error" });
-    } else {
-      res.send({ reviewId: savedReview._id, message: "Review added" });
-    }
-  });
-});
-
-router.post("/review/delete", (req, res) => {
-  const newReview = new Review(req.body.review);
-  Review.deleteOne({ _id: mongoose.Types.ObjectId(req.body.reviewId) }, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.send({ message: "Review deleted" });
-    }
-  });
-});
 
 module.exports = router;

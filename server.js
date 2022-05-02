@@ -10,12 +10,13 @@ const Professor = require("./models/Professor");
 const Review = require("./models/Review");
 const Student = require("./models/Student");
 const studentRouter = require("./routes/apiStudent")
+const professorRouter = require("./routes/apiProfessor")
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
 const MONGODB_URI =
-  "mongodb+srv://niveshduppalapudi:niveshpwa@cluster0.7tmjz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+  "mongodb+srv://niveshduppalapudi:niveshpwa@cluster0.7tmjz.mongodb.net/classroomdb?retryWrites=true&w=majority";
 // const routes = require("./routes/student");
 mongoose.connect(MONGODB_URI);
 
@@ -36,4 +37,5 @@ mongoose.connection.on("connected", () => {
 
 app.use(morgan("tiny"));
 app.use("/student", studentRouter);
+app.use("/professor", professorRouter);
 app.listen(PORT, console.log(`Server is starting at ${PORT}`));

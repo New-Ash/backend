@@ -6,6 +6,7 @@ const CourseSchema = new Schema({
   courseName: String,
   profName: String, ///////////
   courseId: String,
+  studentIds :[String]
 });
 
 //model
