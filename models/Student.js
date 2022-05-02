@@ -7,7 +7,7 @@ const StudentSchema = new Schema({
   name: String,
   studentId: String,
   password: String,
-  courses: [Course], //////////////
+  courses: [], //////////////
   email: String,
 });
 
