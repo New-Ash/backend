@@ -37,7 +37,7 @@ router.post("/note/update", (req, res) => {
     if (err) {
       console.log(err);
     } else if (foundNote) {
-      foundNote.note = note.note;
+      foundNote.content = note.content;
       foundNote.save((err) => {
         if (err) console.log(err);
         else {

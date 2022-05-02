@@ -11,7 +11,7 @@ const Student = require("../models/Student");
 //   if (jwt.verify(authToken)) next();
 //   else res.status(401).json({});
 // };
-
+// /student/login
 router.post("/login", (req, res) => {
   Student.findOne({ email: req.body.email }, (err, foundStudent) => {
     if (err) {
