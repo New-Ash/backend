@@ -64,22 +64,24 @@ router.post("/course/add", (req, res) => {
     if (err) {
       console.log(err);
     } else if (foundProfessor) {
-      Course.findOne({courseId : req.body.courseId}, (err,foundCourse)=>{
-        if(err){
-          console.log(err)
-        }
-        else if (!foundCourse){
+      Course.findOne({ courseId: req.body.courseId }, (err, foundCourse) => {
+        if (err) {
+          console.log(err);
+        } else if (!foundCourse) {
           const newCourse = new Course({
             courseId: req.body.courseId,
             courseName: req.body.courseName,
             profName: foundProfessor.name,
-            studentIds : []
+            studentIds: [],
           });
           newCourse.save((err, savedCourse) => {
             if (err) {
               console.log(err);
             } else {
-              foundProfessor.courses = foundProfessor.courses.concat({courseId : savedCourse.courseId , courseName : savedCourse.courseName});
+              foundProfessor.courses = foundProfessor.courses.concat({
+                courseId: savedCourse.courseId,
+                courseName: savedCourse.courseName,
+              });
               foundProfessor.save((err, savedProf) => {
                 if (err) {
                   console.log(err);
@@ -89,35 +91,37 @@ router.post("/course/add", (req, res) => {
               });
             }
           });
-
         }
-      })
-
+      });
     }
   });
 });
 
 router.post("/course/details", (req, res) => {
-
-  Course.find(
+  Course.findOne(
     {
-      courseId : req.body.courseId
+      courseId: req.body.courseId,
     },
     (err, foundCourse) => {
       if (err) {
         console.log("error", error);
       } else {
-        res.send(foundCourse);
+        if (foundCourse) {
+          Student.find({ studentId: { $in: foundCourse.studentIds } })
+            .then((foundStudents) => {
+              const toSend = foundStudents.map((fs) => ({ studentName: fs.name, studentId: fs.studentId }));
+              res.send(toSend);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
       }
     }
   );
-
 });
 
-
-
 router.post("/lecturelink", (req, res) => {
-
   Review.find(
     {
       $and: [{ courseId: req.body.courseId }, { lecNo: req.body.lecNo }],
@@ -130,10 +134,8 @@ router.post("/lecturelink", (req, res) => {
       }
     }
   );
-
 });
 router.post("/lecture/add", (req, res) => {
-
   const newLecture = new Lecture(req.body.lecture);
   newLecture.save((err, savedLecture) => {
     if (err) {
@@ -143,8 +145,6 @@ router.post("/lecture/add", (req, res) => {
       res.send({ lectureid: savedLecture._id, message: "Lecture added" });
     }
   });
-
 });
-
 
 module.exports = router;
